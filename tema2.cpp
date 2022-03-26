@@ -758,7 +758,7 @@ void Menu()
                 {
                     CardP_aux[i] = CardP[i]; // punem element cu element in aux, mai raman astfel no_of_P_cards elemente
                 }
-                delete []CardS;
+                delete []CardP;
 
                 CardP = new CardPremium[no_of_P_cards + no_of_P_cards_aux];
 
