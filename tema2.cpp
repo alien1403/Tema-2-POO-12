@@ -34,6 +34,7 @@ public:
     void SetDataExpirare(string); // seteaza data de expirare a cardului
     void SetCvv(int); // seteaza cvv-ul
     void SetCredit(double); // seteaza valoarea creditului de pe card
+    void static SetNoOfCards(int);
 
     Card& operator= (const Card& card) // supraincarcarea operatorului = 
     {
@@ -273,6 +274,11 @@ void Card::SetCredit(double credit)
     this->credit = credit;
 }
 
+void Card::SetNoOfCards(int nr)
+{
+    no_of_cards = nr;
+}
+
 istream& operator>>(istream& in, Card& card){
 
     cout<<"Numarul cardului: ";
@@ -284,7 +290,7 @@ istream& operator>>(istream& in, Card& card){
     getline(in, card.NumeDetinator);
     cout<<endl;
 
-    cout<<"Data expirare card: ";
+    cout<<"Data expirare card (format dd-mm-yyyy): ";
     getline(in, card.data_expirare);
     cout<<endl;
 
@@ -375,7 +381,7 @@ istream& operator>>(istream& in, CardStandard& card)
     getline(in, card.NumeDetinator);
     cout<<endl;
 
-    cout<<"Data expirare card: ";
+    cout<<"Data expirare card (format dd-mm-yyyy): ";
     getline(in, card.data_expirare);
     cout<<endl;
 
@@ -494,8 +500,11 @@ void CardPremium::Withdraw(double money)
 
 void Menu()
 {
+
+    vector<Card*> carduri; // upcasting
     CardStandard *CardS, *CardS_aux;
     CardPremium *CardP, *CardP_aux;
+
     CardS = CardS_aux = nullptr;
     CardP = CardP_aux = nullptr;
     int no_of_S_Cards, no_of_P_cards;
@@ -541,10 +550,11 @@ void Menu()
                 for(int i=0;i<no_of_S_Cards;i++)
                 {
                     cout<<"Cardul curent este: "<<i+1<<endl;
+                    CardStandard *cardStandard = new CardStandard();
                     cin>>CardS[i];
+                    *cardStandard = CardS[i]; 
+                    carduri.push_back(cardStandard); // adaug cardul in vectorul de tip Card, pentru a folosi principiul de upcasting
                 }
-
-                cout<<"Au fost inregistrate "<<Card::GetNoOfCard()<<" carduri"<<endl;
             }
             else{
                 cout<<"Numarul de carduri este: ";
@@ -556,12 +566,18 @@ void Menu()
                 for(int i=0;i<no_of_P_cards;i++)
                 {
                     cout<<"Cardul curent este: "<<i+1<<endl;
+                    CardStandard *cardPremium = new CardPremium();
                     cin>>CardP[i];
-                }
-
-                cout<<"Au fost inregistrate "<<Card::GetNoOfCard()<<" carduri"<<endl;
-                
+                    *cardPremium = CardP[i];
+                    carduri.push_back(cardPremium); // adaug cardul in vectorul de tip Card, pentru a folosi principiul de upcasting
+                } 
             }
+            cout<<"Afisez elementele din vectorul de tip card pe care l-am folosit pentru a folosi principiul de upcasting"<<endl;
+            cout<<endl;
+            for(int i=0;i<carduri.size();i++)
+            {
+                cout<<*carduri[i]<<endl;
+            } 
         }
         else if(command == 2)
         {
@@ -803,5 +819,20 @@ int main()
         cin>>command;
     }
     Menu();
+
+    // Downcasting
+    cout<<endl;
+    cout<<endl;
+    cout<<"Verific daca are loc downcasting-ul"<<endl;
+    cout<<endl;
+
+    CardStandard *CardP = new CardPremium();
+
+    if(CardPremium *p = dynamic_cast<CardPremium*>(CardP)){
+        cout<<*p;
+    }
+    else{
+        cout<<"NU";
+    }
     return 0;
 }       
